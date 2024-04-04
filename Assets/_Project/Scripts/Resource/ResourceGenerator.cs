@@ -23,7 +23,7 @@ public class ResourceGenerator : MonoBehaviour
 
     private void Start()
     {
-        StartCoroutine(SpawnEnemies());
+        StartCoroutine(Spawning());
     }
 
     public void Reset()
@@ -31,7 +31,7 @@ public class ResourceGenerator : MonoBehaviour
         _pool.Reset();
     }
 
-    private IEnumerator SpawnEnemies()
+    private IEnumerator Spawning()
     {
         while (enabled)
         {
@@ -47,7 +47,7 @@ public class ResourceGenerator : MonoBehaviour
             _spawnPositionY,
             Random.Range(-_maxBoundY, _maxBoundY));
       
-        Resource Resource = _pool.Peek();
-        Resource.transform.position = spawnPosition;
+        Resource resource = _pool.Peek();
+        resource.transform.position = spawnPosition;
     }
 }

@@ -1,17 +1,18 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 using UnityEngine.Assertions;
 
 public class Base : MonoBehaviour
 {
     [SerializeField] private Sonar _sonar;
-    [SerializeField] private float _orderDelay = 0.5f;
-
     [SerializeField] private List<Unit> _units;
-    private List<Resource> _resources = new List<Resource>();
-
+    
+    [SerializeField] private float _orderDelay = 0.5f;
+    
+    private HashSet<Resource> _resources;
     private int _storedResources = 0;
     private int _valuePerResource = 1;
 
@@ -22,6 +23,7 @@ public class Base : MonoBehaviour
 
     private void Awake()
     {
+        _resources = new HashSet<Resource>();
         _waitOrder = new WaitForSeconds(_orderDelay);
         Assert.IsNotNull(_sonar);
     }
@@ -42,6 +44,12 @@ public class Base : MonoBehaviour
             InitUnit(unit);
 
         _coroutine = StartCoroutine(OrderingResources());
+    }
+    
+    public void Store(Resource resource)
+    {
+        Add(_valuePerResource);
+        resource.Store();
     }
     
     private bool TryGetRestUnit(out Unit result)
@@ -79,18 +87,16 @@ public class Base : MonoBehaviour
         {
             if (TryGetRestUnit(out Unit unit))
             {
-                unit.GetResource(_resources[0]);
-                _resources.Remove(_resources[0]);
+                Resource resource = _resources.ElementAt(0);
+                unit.GetResource(resource);
+                _resources.Remove(resource);
             }
         }
     }
 
     private void WriteResource(Resource resource)
     {
-        if (_resources.Contains(resource) == false)
-        {
-            _resources.Add(resource);
-        }
+        _resources.Add(resource);
     }
 
     private IEnumerator OrderingResources()
@@ -100,11 +106,5 @@ public class Base : MonoBehaviour
             OrderResource();
             yield return _waitOrder;
         }
-    }
-
-    public void Store(Resource resource)
-    {
-        Add(_valuePerResource);
-        resource.Store();
     }
 }
