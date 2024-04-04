@@ -14,7 +14,6 @@ public class Base : MonoBehaviour
     
     private HashSet<Resource> _resources;
     private int _storedResources = 0;
-    private int _valuePerResource = 1;
 
     private Coroutine _coroutine;
     private WaitForSeconds _waitOrder;

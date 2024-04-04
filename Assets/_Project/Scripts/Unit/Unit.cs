@@ -20,29 +20,6 @@ public class Unit : MonoBehaviour
     {
         WorkStatus = WorkStatuses.Rest;
     }
-
-    // private void Update()
-    // {
-    //     // if (WorkStatus == WorkStatuses.GoResource)
-    //     // {
-    //     //     FollowTarget(_resourceTransform);
-    //     //
-    //     //     if (transform.position == _resourceTransform.position)
-    //     //     {
-    //     //         _resource.Grab(transform, _holdPoint);
-    //     //         WorkStatus = WorkStatuses.GoBase;
-    //     //     }
-    //     // } else if (WorkStatus == WorkStatuses.GoBase)
-    //     // {
-    //     //     FollowTarget(_baseTransform);
-    //     //     
-    //     //     if (transform.position == _baseTransform.position)
-    //     //     {
-    //     //         _base.Store(_resource);
-    //     //         WorkStatus = WorkStatuses.Rest;
-    //     //     }
-    //     // }
-    // }
     
     public void SetParentBase(Base basement)
     {
@@ -56,47 +33,51 @@ public class Unit : MonoBehaviour
         _resourceTransform = resource.GetComponent<Transform>();
         WorkStatus = WorkStatuses.GoResource;
         
-        if (_coroutine != null)
-            StopCoroutine(_coroutine);
-        
-        _coroutine = StartCoroutine(CollectingResource(_resource.transform));
+        LaunchCoroutine(CollectingResource());
     }
 
-    private IEnumerator CollectingResource(Transform target)
+    private IEnumerator CollectingResource()
     {
-        while (transform.position != target.position)
-        {
-            FollowTarget(target);
-            yield return Time.deltaTime;
-        }
+        yield return MovingTo(_resourceTransform);
         
         Grab(_resource);
-        WorkStatus = WorkStatuses.GoBase;
-        
-        if (_coroutine != null)
-            StopCoroutine(_coroutine);
-        
-        _coroutine = StartCoroutine(GoingBase(_baseTransform));
-        yield break;
+        LaunchCoroutine(GoingBase());
     }
     
-    private IEnumerator GoingBase(Transform target)
+    private IEnumerator GoingBase()
+    {
+        yield return MovingTo(_baseTransform);
+        Store();
+    }
+
+    private IEnumerator MovingTo(Transform target)
     {
         while (transform.position != target.position)
         {
             FollowTarget(target);
             yield return Time.deltaTime;
         }
-        
-        _base.Store(_resource);
-        WorkStatus = WorkStatuses.Rest;
-        yield break;
     }
 
+    private void LaunchCoroutine(IEnumerator routine)
+    {
+        if (_coroutine != null)
+            StopCoroutine(_coroutine);
+        
+        _coroutine = StartCoroutine(routine);
+    }
+
+    private void Store()
+    {
+        _base.Store(_resource);
+        WorkStatus = WorkStatuses.Rest;
+    }
+    
     private void Grab(Resource resource)
     {
         resource.transform.parent = transform;
         resource.transform.position = _holdPoint.position;
+        WorkStatus = WorkStatuses.GoBase;
     }
 
     private void FollowTarget(Transform target)
