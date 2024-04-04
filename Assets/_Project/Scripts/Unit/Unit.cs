@@ -70,7 +70,7 @@ public class Unit : MonoBehaviour
             yield return Time.deltaTime;
         }
         
-        _resource.Grab(transform, _holdPoint);
+        Grab(_resource);
         WorkStatus = WorkStatuses.GoBase;
         
         if (_coroutine != null)
@@ -91,6 +91,12 @@ public class Unit : MonoBehaviour
         _base.Store(_resource);
         WorkStatus = WorkStatuses.Rest;
         yield break;
+    }
+
+    private void Grab(Resource resource)
+    {
+        resource.transform.parent = transform;
+        resource.transform.position = _holdPoint.position;
     }
 
     private void FollowTarget(Transform target)

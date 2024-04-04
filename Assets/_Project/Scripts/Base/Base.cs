@@ -48,8 +48,9 @@ public class Base : MonoBehaviour
     
     public void Store(Resource resource)
     {
-        Add(_valuePerResource);
-        resource.Store();
+        Add(resource.Value);
+        resource.transform.parent = transform;
+        resource.gameObject.SetActive(false);
     }
     
     private bool TryGetRestUnit(out Unit result)

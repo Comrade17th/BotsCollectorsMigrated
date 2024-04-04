@@ -2,17 +2,12 @@ using UnityEngine;
 
 public class Resource : MonoBehaviour
 {
-    private Transform _container;
+    [SerializeField] private int _defaultValue = 1; 
     
-    public void Grab(Transform parent, Transform holdPoint)
-    {
-        transform.parent = parent;
-        transform.position = holdPoint.position;
-    }
+    public int Value { get; private set; }
 
-    public void Store()
+    public Resource()
     {
-        transform.parent = _container;
-        gameObject.SetActive(false);
+        Value = _defaultValue;
     }
 }
